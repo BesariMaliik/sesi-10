@@ -1,18 +1,25 @@
-import { Builder, By, until } from "selenium-webdriver";
-import { expect } from "chai";
+import { Builder, By, until } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome.js';
+import { expect } from 'chai';
+
+
 
 describe("SauceDemo Automation Test", function () {
+    
+  let options = new chrome.Options();
+        options.addArguments("--incognito"); // Setting incognito di sini
   let driver;
-  this.timeout(40000);
+    this.timeout(40000);
 
-  before(async () => {
-    driver = await new Builder().forBrowser("chrome").build();
-  });
-
-  // =========================
   // TEST CASE 1 - LOGIN
-  // =========================
+
   it("TC01 - Login berhasil menggunakan user valid", async () => {
+            
+    driver = await new Builder()
+            .forBrowser("chrome")
+            .setChromeOptions(options)
+            .build();
+    
     await driver.get("https://www.saucedemo.com/");
 
     let inputUsername = await driver.findElement(By.css('[data-test="username"]'))
@@ -24,18 +31,19 @@ describe("SauceDemo Automation Test", function () {
      let buttonLogin = await driver.findElement(By.className('submit-button btn_action'))
       await buttonLogin.click();
 
-    await driver.wait(until.urlContains("inventory.html"), 10000);
+    
+      await driver.wait(until.urlContains("inventory.html"), 10000);
 
     const title = await driver
       .findElement(By.className("title"))
       .getText()
+
+      expect(title).to.equal("Products");
       
-    expect(title).to.equal("Products");
   });
 
-  // =========================
   // TEST CASE 2 - SORT Z → A
-  // =========================
+
   it("TC02 - Mengurutkan produk dari Z ke A", async () => {
     const sortDropdown = await driver.findElement(
       By.xpath('//select[@data-test="product-sort-container"]'));
@@ -56,7 +64,10 @@ describe("SauceDemo Automation Test", function () {
 
   });
 
+  // TEST CASE 3 - Low ke High
+  
   it("TC03 - Mengurutkan produk berdasarkan harga Low ke High", async () => {
+ 
     const sortDropdown = await driver.findElement(
        By.className("product_sort_container")
       );
@@ -74,10 +85,7 @@ describe("SauceDemo Automation Test", function () {
     const expectedSortedPrices = [...prices].sort((a, b) => a - b);
 
     expect(prices).to.deep.equal(expectedSortedPrices);
-  });
-
-  after(async () => {
     await driver.quit();
   });
-
+  
 });
