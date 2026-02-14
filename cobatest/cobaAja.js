@@ -16,9 +16,7 @@ describe("SauceDemo Automation Test", function () {
   });
 
     after(async () => {
-    if (driver) {
-            await driver.quit();
-        }
+    await driver.quit();
   });
 
 
