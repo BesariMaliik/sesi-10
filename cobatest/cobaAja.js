@@ -3,23 +3,29 @@ import chrome from 'selenium-webdriver/chrome.js';
 import { expect } from 'chai';
 
 
-
 describe("SauceDemo Automation Test", function () {
-    
-  let options = new chrome.Options();
-        options.addArguments("--incognito"); // Setting incognito di sini
   let driver;
-    this.timeout(40000);
+
+   before(async () => {
+    let options = new chrome.Options();
+        options.addArguments("--incognito");
+        
+        driver = await new Builder()
+        .forBrowser("chrome")
+        .setChromeOptions(options).build();
+  });
+
+    after(async () => {
+    if (driver) {
+            await driver.quit();
+        }
+  });
+
 
   // TEST CASE 1 - LOGIN
 
   it("TC01 - Login berhasil menggunakan user valid", async () => {
             
-    driver = await new Builder()
-            .forBrowser("chrome")
-            .setChromeOptions(options)
-            .build();
-    
     await driver.get("https://www.saucedemo.com/");
 
     let inputUsername = await driver.findElement(By.css('[data-test="username"]'))
@@ -46,7 +52,7 @@ describe("SauceDemo Automation Test", function () {
 
   it("TC02 - Mengurutkan produk dari Z ke A", async () => {
     const sortDropdown = await driver.findElement(
-      By.xpath('//select[@data-test="product-sort-container"]'));
+      By.className("product_sort_container"));
       await sortDropdown.sendKeys("Name (Z to A)");
 
     const productElements = await driver.findElements(
@@ -85,7 +91,7 @@ describe("SauceDemo Automation Test", function () {
     const expectedSortedPrices = [...prices].sort((a, b) => a - b);
 
     expect(prices).to.deep.equal(expectedSortedPrices);
-    await driver.quit();
+   
   });
   
 });
